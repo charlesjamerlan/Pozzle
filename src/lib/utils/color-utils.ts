@@ -43,3 +43,96 @@ export function shouldUseWhiteText(hex: string): boolean {
   const { r, g, b } = hexToRgb(hex);
   return luminance(r, g, b) < 0.179;
 }
+
+// ---------------------------------------------------------------------------
+// New in Phase 2 — color format conversions for CSS parser
+// ---------------------------------------------------------------------------
+
+/** Convert r,g,b (0-255) to 6-digit hex string with leading #. */
+export function rgbToHex(r: number, g: number, b: number): string {
+  const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
+  return (
+    "#" +
+    [clamp(r), clamp(g), clamp(b)]
+      .map((c) => c.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase()
+  );
+}
+
+/** Convert HSL (h: 0-360, s: 0-100, l: 0-100) to {r, g, b} (0-255). */
+export function hslToRgb(
+  h: number,
+  s: number,
+  l: number,
+): { r: number; g: number; b: number } {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+  };
+  return {
+    r: Math.round(f(0) * 255),
+    g: Math.round(f(8) * 255),
+    b: Math.round(f(4) * 255),
+  };
+}
+
+/**
+ * Parse any CSS color string to a normalised 6-digit uppercase hex (#RRGGBB).
+ * Returns null for values it cannot parse (e.g. var(), inherit, transparent).
+ */
+export function parseColorString(raw: string): string | null {
+  const s = raw.trim().toLowerCase();
+
+  // #RGB → #RRGGBB
+  if (/^#[0-9a-f]{3}$/i.test(s)) {
+    const [, r, g, b] = s.match(/^#(.)(.)(.)$/)!;
+    return `#${r}${r}${g}${g}${b}${b}`.toUpperCase();
+  }
+
+  // #RGBA → #RRGGBB (drop alpha)
+  if (/^#[0-9a-f]{4}$/i.test(s)) {
+    const [, r, g, b] = s.match(/^#(.)(.)(.).$/)!;
+    return `#${r}${r}${g}${g}${b}${b}`.toUpperCase();
+  }
+
+  // #RRGGBB
+  if (/^#[0-9a-f]{6}$/i.test(s)) {
+    return s.toUpperCase();
+  }
+
+  // #RRGGBBAA → #RRGGBB (drop alpha)
+  if (/^#[0-9a-f]{8}$/i.test(s)) {
+    return s.slice(0, 7).toUpperCase();
+  }
+
+  // rgb(r, g, b) / rgba(r, g, b, a)
+  const rgbMatch = s.match(
+    /rgba?\s*\(\s*([\d.]+)%?\s*[,\s]\s*([\d.]+)%?\s*[,\s]\s*([\d.]+)%?\s*(?:[,/]\s*[\d.]+%?\s*)?\)/,
+  );
+  if (rgbMatch) {
+    return rgbToHex(
+      parseFloat(rgbMatch[1]),
+      parseFloat(rgbMatch[2]),
+      parseFloat(rgbMatch[3]),
+    );
+  }
+
+  // hsl(h, s%, l%) / hsla(h, s%, l%, a)
+  const hslMatch = s.match(
+    /hsla?\s*\(\s*([\d.]+)(?:deg)?\s*[,\s]\s*([\d.]+)%\s*[,\s]\s*([\d.]+)%\s*(?:[,/]\s*[\d.]+%?\s*)?\)/,
+  );
+  if (hslMatch) {
+    const { r, g, b } = hslToRgb(
+      parseFloat(hslMatch[1]),
+      parseFloat(hslMatch[2]),
+      parseFloat(hslMatch[3]),
+    );
+    return rgbToHex(r, g, b);
+  }
+
+  return null;
+}

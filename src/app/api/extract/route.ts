@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { crawlUrl } from "@/lib/services/crawl-service";
+import { config } from "@/lib/config";
 import { extractTokens } from "@/lib/services/extraction-service";
+import { saveExtraction } from "@/lib/services/persistence-service";
 
 export async function POST(request: Request) {
   try {
@@ -11,16 +12,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Crawl the URL
-    const crawlResult = await crawlUrl(url);
-    if (!crawlResult.success) {
-      return NextResponse.json({ error: "Failed to crawl URL" }, { status: 500 });
-    }
-
-    // Extract tokens
+    // Pipeline: crawl → parse → name → analyze (all inside extractTokens)
     const { extraction, report } = await extractTokens(url);
 
-    return NextResponse.json({ extraction, report });
+    // Persist if user is authenticated via Supabase
+    let savedId: string | null = null;
+    if (config.supabase.enabled) {
+      try {
+        const { createClient } = await import("@/lib/supabase/server");
+        const supabase = await createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          savedId = await saveExtraction(user.id, url, extraction, report);
+        }
+      } catch {
+        // Non-critical — extraction still succeeds
+      }
+    }
+
+    return NextResponse.json({ extraction, report, savedId });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
