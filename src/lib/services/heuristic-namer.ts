@@ -178,20 +178,89 @@ function nameTypography(rawTypo: RawTypography[]): TypographyToken[] {
     (a, b) => toPixels(b.fontSize) - toPixels(a.fontSize),
   );
 
-  const names = [
-    "heading-1", "heading-2", "heading-3", "heading-4",
-    "body", "body-small", "caption", "code",
-  ];
+  // Classify into display, heading, body, and small tiers based on size + weight
+  const usedNames = new Set<string>();
+  const result: TypographyToken[] = [];
 
-  return sorted.slice(0, 8).map((t, i) => ({
-    name: names[i] ?? `text-${i + 1}`,
-    fontFamily: t.fontFamily,
-    fontSize: t.fontSize,
-    fontWeight: t.fontWeight,
-    lineHeight: t.lineHeight,
-    letterSpacing: t.letterSpacing,
-    usage: i < 4 ? "Heading text" : i < 6 ? "Body text" : "Small text",
-  }));
+  // Tier thresholds (in px)
+  const DISPLAY_MIN = 36;
+  const HEADING_MIN = 20;
+  const BODY_MIN = 14;
+  // Below BODY_MIN = small/caption
+
+  let displayIdx = 1;
+  let headingIdx = 1;
+  let bodyCount = 0;
+  let smallCount = 0;
+
+  for (const t of sorted) {
+    const px = toPixels(t.fontSize);
+    const isBold = t.fontWeight >= 600;
+    let name: string;
+    let usage: string;
+
+    if (px >= DISPLAY_MIN) {
+      // Display tier — large decorative/hero text
+      name = displayIdx === 1 ? "display" : `display-${displayIdx}`;
+      usage = "Display / hero text";
+      displayIdx++;
+    } else if (px >= HEADING_MIN || (px >= 18 && isBold)) {
+      // Heading tier — sectional headings
+      name = `heading-${headingIdx}`;
+      usage = "Section heading";
+      headingIdx++;
+    } else if (px >= BODY_MIN) {
+      // Body tier — distinguish by weight
+      if (isBold && bodyCount === 0) {
+        name = "label";
+        usage = "Label / emphasis text";
+      } else if (bodyCount === 0) {
+        name = "body";
+        usage = "Body text, paragraphs";
+      } else if (bodyCount === 1) {
+        name = isBold ? "label-small" : "body-small";
+        usage = isBold ? "Small label text" : "Secondary body text";
+      } else {
+        name = `body-${bodyCount + 1}`;
+        usage = "Body text variant";
+      }
+      bodyCount++;
+    } else {
+      // Small tier — captions, fine print
+      if (smallCount === 0) {
+        name = "caption";
+        usage = "Captions, helper text, metadata";
+      } else if (smallCount === 1) {
+        name = "overline";
+        usage = "Overline, micro text";
+      } else {
+        name = `small-${smallCount + 1}`;
+        usage = "Fine print";
+      }
+      smallCount++;
+    }
+
+    // Deduplicate
+    if (usedNames.has(name)) {
+      const base = name;
+      let suffix = 2;
+      while (usedNames.has(`${base}-${suffix}`)) suffix++;
+      name = `${base}-${suffix}`;
+    }
+    usedNames.add(name);
+
+    result.push({
+      name,
+      fontFamily: t.fontFamily,
+      fontSize: t.fontSize,
+      fontWeight: t.fontWeight,
+      lineHeight: t.lineHeight,
+      letterSpacing: t.letterSpacing,
+      usage,
+    });
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -243,15 +312,20 @@ function scoreColors(result: ExtractionResult): ConsistencyMetric {
   const unique = result.colors.length;
   const issues: string[] = [];
 
-  if (unique > 15) issues.push(`${unique} unique colors detected — consider consolidating`);
+  if (unique > 20) issues.push(`${unique} unique colors detected — consider consolidating`);
   const singleUse = result.colors.filter((c) => c.count === 1).length;
-  if (singleUse > 2) issues.push(`${singleUse} colors used only once — likely one-offs`);
+  if (singleUse > 3) issues.push(`${singleUse} colors used only once — likely one-offs`);
 
   // Check for near-duplicates
   const nearDupes = countNearDuplicateColors(result.colors);
   if (nearDupes > 0) issues.push(`${nearDupes} near-duplicate color pairs detected`);
 
-  const score = Math.max(0, Math.min(100, 100 - unique * 2 - singleUse * 3 - nearDupes * 5));
+  // Score: 12 or fewer unique = perfect; gentle penalty beyond that
+  // single-use and near-dupes are minor deductions
+  const excessColors = Math.max(0, unique - 12);
+  const score = Math.max(20, Math.min(100,
+    95 - excessColors * 1.5 - singleUse * 1 - nearDupes * 2,
+  ));
 
   return {
     category: "Colors",
@@ -259,9 +333,11 @@ function scoreColors(result: ExtractionResult): ConsistencyMetric {
     total,
     unique,
     issues,
-    recommendation: unique > 12
+    recommendation: unique > 16
       ? "Consolidate to 10-12 intentional colors with semantic naming."
-      : "Color palette is reasonably sized.",
+      : unique > 12
+        ? "Color palette is slightly large — check for near-duplicates."
+        : "Color palette is well-contained.",
   };
 }
 
@@ -269,9 +345,11 @@ function scoreTypography(result: ExtractionResult): ConsistencyMetric {
   const unique = result.typography.length;
   const issues: string[] = [];
 
-  if (unique > 8) issues.push(`${unique} font sizes — consider a stricter type scale`);
+  if (unique > 10) issues.push(`${unique} font sizes — consider a stricter type scale`);
 
-  const score = Math.max(0, Math.min(100, 100 - Math.max(0, unique - 6) * 8));
+  // 8 or fewer sizes = perfect; gentle penalty beyond
+  const excess = Math.max(0, unique - 8);
+  const score = Math.max(30, Math.min(100, 95 - excess * 4));
 
   return {
     category: "Typography",
@@ -279,7 +357,7 @@ function scoreTypography(result: ExtractionResult): ConsistencyMetric {
     total: unique,
     unique,
     issues,
-    recommendation: unique > 8
+    recommendation: unique > 10
       ? "Adopt a strict modular type scale (e.g., 12, 14, 16, 20, 24, 30, 36px)."
       : "Typography scale is well-contained.",
   };
@@ -291,9 +369,13 @@ function scoreSpacing(result: ExtractionResult): ConsistencyMetric {
 
   // Check 4px grid adherence
   const offGrid = result.spacing.filter((s) => s.pixels % 4 !== 0).length;
-  if (offGrid > 0) issues.push(`${offGrid} spacing values fall outside a 4px grid`);
+  const offGridRatio = unique > 0 ? offGrid / unique : 0;
+  if (offGrid > 0) issues.push(`${offGrid} of ${unique} spacing values fall outside a 4px grid`);
 
-  const score = Math.max(0, Math.min(100, 100 - offGrid * 8 - Math.max(0, unique - 8) * 5));
+  // Score based on ratio of off-grid values, not raw count
+  const gridPenalty = offGridRatio * 25;
+  const excessPenalty = Math.max(0, unique - 9) * 3;
+  const score = Math.max(30, Math.min(100, 95 - gridPenalty - excessPenalty));
 
   return {
     category: "Spacing",
@@ -301,9 +383,9 @@ function scoreSpacing(result: ExtractionResult): ConsistencyMetric {
     total: unique,
     unique,
     issues,
-    recommendation: offGrid > 0
+    recommendation: offGridRatio > 0.4
       ? "Align all spacing to a 4px (0.25rem) base grid."
-      : "Spacing follows a consistent grid.",
+      : "Spacing follows a reasonably consistent grid.",
   };
 }
 
@@ -311,9 +393,10 @@ function scoreRadius(result: ExtractionResult): ConsistencyMetric {
   const unique = result.radius.length;
   const issues: string[] = [];
 
-  if (unique > 5) issues.push(`${unique} border-radius values — simplify to 3-4 tokens`);
+  if (unique > 6) issues.push(`${unique} border-radius values — simplify to 4-5 tokens`);
 
-  const score = Math.max(0, Math.min(100, 100 - Math.max(0, unique - 4) * 10));
+  const excess = Math.max(0, unique - 5);
+  const score = Math.max(40, Math.min(100, 95 - excess * 5));
 
   return {
     category: "Border Radius",
@@ -321,8 +404,8 @@ function scoreRadius(result: ExtractionResult): ConsistencyMetric {
     total: unique,
     unique,
     issues,
-    recommendation: unique > 4
-      ? "Define 3-4 radius tokens (sm, md, lg, full) and use them consistently."
+    recommendation: unique > 6
+      ? "Define 4-5 radius tokens (sm, md, lg, xl, full) and use them consistently."
       : "Border radius tokens are well-contained.",
   };
 }
@@ -359,11 +442,13 @@ function deduplicateByPixels<T extends { pixels: number; count: number }>(
 }
 
 function gradeFromScore(score: number): string {
-  if (score >= 90) return "A";
-  if (score >= 80) return "B+";
+  if (score >= 92) return "A+";
+  if (score >= 85) return "A";
+  if (score >= 78) return "B+";
   if (score >= 70) return "B";
-  if (score >= 60) return "C+";
-  if (score >= 50) return "C";
+  if (score >= 62) return "B-";
+  if (score >= 55) return "C+";
+  if (score >= 48) return "C";
   if (score >= 40) return "D";
   return "F";
 }

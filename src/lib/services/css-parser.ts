@@ -160,69 +160,156 @@ function extractColorValues(value: string): string[] {
 // ---------------------------------------------------------------------------
 
 function extractTypography(css: string): RawTypography[] {
-  const families = new Map<string, number>();
-  const sizes = new Map<string, number>();
-  const weights = new Map<number, number>();
-  const lineHeights = new Map<string, number>();
-  const letterSpacings = new Map<string, number>();
+  // ---- Step 1: Parse per-rule-block typography combos ----
+  // Split CSS into declaration blocks and extract co-occurring font properties.
+  const blockRegex = /\{([^}]+)\}/g;
+  let blockMatch: RegExpExecArray | null;
 
-  matchProp(css, "font-family", (v) => {
-    const clean = v.split(",")[0].replace(/["']/g, "").trim();
-    if (clean) inc(families, clean);
-  });
-
-  matchProp(css, "font-size", (v) => {
-    const clean = v.trim();
-    if (clean && !clean.startsWith("var(")) inc(sizes, clean);
-  });
-
-  matchProp(css, "font-weight", (v) => {
-    const n = parseFontWeight(v.trim());
-    if (n) inc(weights, n);
-  });
-
-  matchProp(css, "line-height", (v) => {
-    const clean = v.trim();
-    if (clean && clean !== "normal") inc(lineHeights, clean);
-  });
-
-  matchProp(css, "letter-spacing", (v) => {
-    const clean = v.trim();
-    if (clean && clean !== "normal") inc(letterSpacings, clean);
-  });
-
-  // Parse `font` shorthand
-  const fontShorthand = /font\s*:\s*([^;}{]+)/gi;
-  let m: RegExpExecArray | null;
-  while ((m = fontShorthand.exec(css)) !== null) {
-    const parts = m[1].trim().split(/\s+/);
-    for (const p of parts) {
-      if (/^\d+$/.test(p)) {
-        const w = parseInt(p, 10);
-        if (w >= 100 && w <= 900) inc(weights, w);
-      } else if (/^\d/.test(p) && /(?:px|rem|em|%)/.test(p)) {
-        const sizeLine = p.split("/");
-        inc(sizes, sizeLine[0]);
-        if (sizeLine[1]) inc(lineHeights, sizeLine[1]);
-      }
-    }
+  interface FontCombo {
+    family: string | null;
+    size: string | null;
+    weight: number | null;
+    lineHeight: string | null;
+    letterSpacing: string | null;
   }
 
-  // Combine into unique font styles grouped by size
-  const primaryFamily = [...families.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "sans-serif";
-  const sortedSizes = [...sizes.entries()].sort((a, b) => toPixels(b[0]) - toPixels(a[0]));
-  const defaultWeight = [...weights.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 400;
-  const defaultLineHeight = [...lineHeights.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "1.5";
-  const defaultLetterSpacing = [...letterSpacings.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "0";
+  const combos: FontCombo[] = [];
 
-  return sortedSizes.map(([fontSize, count]) => ({
-    fontFamily: primaryFamily,
-    fontSize,
-    fontWeight: defaultWeight,
-    lineHeight: defaultLineHeight,
-    letterSpacing: defaultLetterSpacing,
-    count,
-  }));
+  while ((blockMatch = blockRegex.exec(css)) !== null) {
+    const block = blockMatch[1];
+    const combo: FontCombo = {
+      family: null,
+      size: null,
+      weight: null,
+      lineHeight: null,
+      letterSpacing: null,
+    };
+
+    // Extract individual properties from this block
+    const familyMatch = block.match(/font-family\s*:\s*([^;]+)/i);
+    if (familyMatch) {
+      combo.family = familyMatch[1].split(",")[0].replace(/["']/g, "").trim();
+    }
+
+    const sizeMatch = block.match(/font-size\s*:\s*([^;]+)/i);
+    if (sizeMatch) {
+      const v = sizeMatch[1].trim();
+      if (!v.startsWith("var(")) combo.size = v;
+    }
+
+    const weightMatch = block.match(/font-weight\s*:\s*([^;]+)/i);
+    if (weightMatch) {
+      combo.weight = parseFontWeight(weightMatch[1].trim());
+    }
+
+    const lhMatch = block.match(/line-height\s*:\s*([^;]+)/i);
+    if (lhMatch) {
+      const v = lhMatch[1].trim();
+      if (v !== "normal") combo.lineHeight = v;
+    }
+
+    const lsMatch = block.match(/letter-spacing\s*:\s*([^;]+)/i);
+    if (lsMatch) {
+      const v = lsMatch[1].trim();
+      if (v !== "normal") combo.letterSpacing = v;
+    }
+
+    // Parse font shorthand (e.g. "font: 700 16px/24px UberMoveText")
+    const fontShort = block.match(/(?:^|;)\s*font\s*:\s*([^;]+)/i);
+    if (fontShort) {
+      const val = fontShort[1].trim();
+      // Extract weight
+      const wMatch = val.match(/\b(\d{3})\b/);
+      if (wMatch) {
+        const w = parseInt(wMatch[1], 10);
+        if (w >= 100 && w <= 900 && !combo.weight) combo.weight = w;
+      }
+      if (/\bbold\b/i.test(val) && !combo.weight) combo.weight = 700;
+      // Extract size/line-height
+      const slMatch = val.match(/([\d.]+(?:px|rem|em))\s*(?:\/([\d.]+(?:px|rem|em|%)?))?\s/);
+      if (slMatch) {
+        if (!combo.size) combo.size = slMatch[1];
+        if (slMatch[2] && !combo.lineHeight) combo.lineHeight = slMatch[2];
+      }
+      // Extract family (last comma-separated segment)
+      const familyPart = val.match(/(?:[\d.]+(?:px|rem|em)(?:\s*\/\s*[\d.]+(?:px|rem|em|%)?)?)\s+(.+)$/);
+      if (familyPart && !combo.family) {
+        combo.family = familyPart[1].split(",")[0].replace(/["']/g, "").trim();
+      }
+    }
+
+    if (combo.size) combos.push(combo);
+  }
+
+  // ---- Step 2: Build global defaults from frequency ----
+  const globalFamilies = new Map<string, number>();
+  const globalWeights = new Map<number, number>();
+  const globalLineHeights = new Map<string, number>();
+  const globalLetterSpacings = new Map<string, number>();
+
+  for (const c of combos) {
+    if (c.family) inc(globalFamilies, c.family);
+    if (c.weight) inc(globalWeights, c.weight);
+    if (c.lineHeight) inc(globalLineHeights, c.lineHeight);
+    if (c.letterSpacing) inc(globalLetterSpacings, c.letterSpacing);
+  }
+
+  const defaultFamily = topKey(globalFamilies) ?? "sans-serif";
+  const defaultWeight = topKey(globalWeights) ?? 400;
+  const defaultLineHeight = topKey(globalLineHeights) ?? "1.5";
+  const defaultLetterSpacing = topKey(globalLetterSpacings) ?? "0";
+
+  // ---- Step 3: Group by font-size, pick best properties per size ----
+  const sizeGroups = new Map<string, FontCombo[]>();
+  for (const c of combos) {
+    if (!c.size) continue;
+    const key = c.size;
+    if (!sizeGroups.has(key)) sizeGroups.set(key, []);
+    sizeGroups.get(key)!.push(c);
+  }
+
+  const results: RawTypography[] = [];
+
+  for (const [size, group] of sizeGroups) {
+    // For each property, pick the most common value within this size's group
+    const fams = new Map<string, number>();
+    const wts = new Map<number, number>();
+    const lhs = new Map<string, number>();
+    const lss = new Map<string, number>();
+
+    for (const c of group) {
+      if (c.family) inc(fams, c.family);
+      if (c.weight) inc(wts, c.weight);
+      if (c.lineHeight) inc(lhs, c.lineHeight);
+      if (c.letterSpacing) inc(lss, c.letterSpacing);
+    }
+
+    results.push({
+      fontFamily: topKey(fams) ?? defaultFamily,
+      fontSize: size,
+      fontWeight: topKey(wts) ?? defaultWeight,
+      lineHeight: topKey(lhs) ?? defaultLineHeight,
+      letterSpacing: topKey(lss) ?? defaultLetterSpacing,
+      count: group.length,
+    });
+  }
+
+  // Sort by pixel size descending
+  results.sort((a, b) => toPixels(b.fontSize) - toPixels(a.fontSize));
+  return results;
+}
+
+/** Return the key with the highest count in a Map */
+function topKey<K>(map: Map<K, number>): K | null {
+  let best: K | null = null;
+  let bestCount = 0;
+  for (const [key, count] of map) {
+    if (count > bestCount) {
+      best = key;
+      bestCount = count;
+    }
+  }
+  return best;
 }
 
 function parseFontWeight(v: string): number | null {
