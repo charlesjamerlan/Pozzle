@@ -1,0 +1,8 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Layer 1: Furthest back -->
+  <rect x="8" y="38" width="46" height="46" rx="11" fill="#ECECEF" opacity="0.1"/>
+  <!-- Layer 2: Middle -->
+  <rect x="22" y="24" width="46" height="46" rx="11" fill="#ECECEF" opacity="0.2"/>
+  <!-- Layer 3: Front (reconciled) -->
+  <rect x="38" y="12" width="46" height="46" rx="11" fill="#ECECEF"/>
+</svg>

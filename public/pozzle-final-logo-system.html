@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pozzle — Final Logo System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #06060A;
+    color: #ECECEF;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 60px 40px 120px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #E8604C, #D4507A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header p {
+    color: #6B6B76;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header .sub {
+    color: #4A4A54;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 72px 0 12px;
+  }
+
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1E1E24;
+  }
+
+  .section-header h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .section-header:first-child { margin-top: 0; }
+
+  .section-sub {
+    color: #6B6B76;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+
+  /* Hero display */
+  .hero-display {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 24px;
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    margin-bottom: 32px;
+  }
+
+  .hero-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Variant cards */
+  .variant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .variant-card {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+
+  .variant-card:hover { border-color: #2A2A2F; }
+
+  .variant-display {
+    padding: 48px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+  }
+
+  .variant-info {
+    border-top: 1px solid #1E1E24;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .variant-info .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #A0A0A8;
+  }
+
+  .variant-info .tag {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4A4A54;
+  }
+
+  .variant-info .tag.primary {
+    color: #E8604C;
+  }
+
+  /* Scale row */
+  .scale-row {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 16px;
+    padding: 48px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .scale-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scale-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4A4A54;
+  }
+
+  /* Full width card */
+  .full-card {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .full-card .display {
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .full-card .info {
+    border-top: 1px solid #1E1E24;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .full-card .info .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #A0A0A8;
+  }
+
+  .full-card .info .tag {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4A4A54;
+  }
+
+  /* Clearspace guide */
+  .clearspace-display {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Specs */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .spec-card {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .spec-card .label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4A4A54;
+    margin-bottom: 12px;
+  }
+
+  .spec-card .value {
+    font-size: 14px;
+    color: #ECECEF;
+    font-family: 'JetBrains Mono', 'DM Sans', monospace;
+    line-height: 1.8;
+  }
+
+  .color-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* Context mockups */
+  .context-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .context-card {
+    background: #0D0D10;
+    border: 1px solid #1E1E24;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .context-top {
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+  }
+
+  .context-bottom {
+    border-top: 1px solid #1E1E24;
+    padding: 14px 20px;
+  }
+
+  .context-bottom .label {
+    font-size: 11px;
+    color: #6B6B76;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .favicon-mock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1E1E24;
+    border-radius: 6px;
+    padding: 6px 12px 6px 8px;
+  }
+
+  .favicon-mock span {
+    font-size: 12px;
+    color: #A0A0A8;
+  }
+
+  .social-mock {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #F0755E, #A83D6A);
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG definitions -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Primary gradient -->
+    <linearGradient id="pz-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0755E"/>
+      <stop offset="50%" stop-color="#D4507A"/>
+      <stop offset="100%" stop-color="#A83D6A"/>
+    </linearGradient>
+    <!-- Highlight -->
+    <linearGradient id="pz-hi" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Edge border -->
+    <linearGradient id="pz-edge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5A898"/>
+      <stop offset="100%" stop-color="#A83D6A"/>
+    </linearGradient>
+    <!-- Shadow -->
+    <filter id="pz-shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#E8604C" flood-opacity="0.25"/>
+    </filter>
+    <!-- Wordmark gradient -->
+    <linearGradient id="pz-text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F0755E"/>
+      <stop offset="100%" stop-color="#A83D6A"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="header">
+  <h1>Pozzle Logo System</h1>
+  <p>Final · C3 — Deep Gradient + Shadow + Edge</p>
+  <div class="sub">Triple-layer Puzzle Shift with dimensional front square</div>
+</div>
+
+<div class="container">
+
+  <!-- ==================== PRIMARY MARK ==================== -->
+  <div class="section-header">
+    <h2>Primary Mark</h2>
+  </div>
+
+  <div class="hero-display">
+    <div class="hero-icon">
+      <svg width="180" height="180" viewBox="0 0 100 100" fill="none">
+        <defs>
+          <clipPath id="hero-clip"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath>
+        </defs>
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#hero-clip)"/>
+        <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+      </svg>
+    </div>
+    <svg width="420" height="72" viewBox="0 0 420 72" fill="none">
+      <defs>
+        <clipPath id="lockup-clip"><rect x="28" y="10" width="40" height="40" rx="10"/></clipPath>
+      </defs>
+      <!-- Icon -->
+      <rect x="6" y="28" width="36" height="36" rx="9" fill="#E8604C" opacity="0.15"/>
+      <rect x="16" y="18" width="36" height="36" rx="9" fill="#E8604C" opacity="0.3"/>
+      <rect x="28" y="10" width="40" height="40" rx="10" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+      <rect x="28" y="10" width="40" height="40" rx="10" fill="url(#pz-hi)" clip-path="url(#lockup-clip)"/>
+      <rect x="29" y="11" width="38" height="38" rx="9" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+      <!-- Wordmark -->
+      <text x="84" y="46" font-family="'DM Sans', sans-serif" font-weight="700" font-size="38" fill="#ECECEF" letter-spacing="-0.03em">pozzle</text>
+    </svg>
+  </div>
+
+  <!-- ==================== ALL VARIANTS ==================== -->
+  <div class="section-header">
+    <h2>Lockup Variants</h2>
+  </div>
+  <p class="section-sub">Every context covered — dark, light, gradient wordmark, and monochrome.</p>
+
+  <div class="variant-grid">
+    <!-- Dark (primary) -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #06060A;">
+        <svg width="300" height="56" viewBox="0 0 360 60" fill="none">
+          <defs><clipPath id="v1c"><rect x="26" y="8" width="36" height="36" rx="9"/></clipPath></defs>
+          <rect x="4" y="22" width="34" height="34" rx="8" fill="#E8604C" opacity="0.15"/>
+          <rect x="14" y="14" width="34" height="34" rx="8" fill="#E8604C" opacity="0.3"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-hi)" clip-path="url(#v1c)"/>
+          <rect x="27" y="9" width="34" height="34" rx="8" stroke="url(#pz-edge)" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="#ECECEF" letter-spacing="-0.03em">pozzle</text>
+        </svg>
+      </div>
+      <div class="variant-info">
+        <span class="name">Dark Background</span>
+        <span class="tag primary">Primary</span>
+      </div>
+    </div>
+
+    <!-- Light -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #FFFFFF;">
+        <svg width="300" height="56" viewBox="0 0 360 60" fill="none">
+          <defs><clipPath id="v2c"><rect x="26" y="8" width="36" height="36" rx="9"/></clipPath></defs>
+          <rect x="4" y="22" width="34" height="34" rx="8" fill="#E8604C" opacity="0.12"/>
+          <rect x="14" y="14" width="34" height="34" rx="8" fill="#E8604C" opacity="0.22"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-grad)"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-hi)" clip-path="url(#v2c)"/>
+          <rect x="27" y="9" width="34" height="34" rx="8" stroke="url(#pz-edge)" stroke-width="0.8" fill="none" opacity="0.4"/>
+          <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="#111114" letter-spacing="-0.03em">pozzle</text>
+        </svg>
+      </div>
+      <div class="variant-info">
+        <span class="name">Light Background</span>
+        <span class="tag">Variant</span>
+      </div>
+    </div>
+
+    <!-- Gradient wordmark -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #06060A;">
+        <svg width="300" height="56" viewBox="0 0 360 60" fill="none">
+          <defs><clipPath id="v3c"><rect x="26" y="8" width="36" height="36" rx="9"/></clipPath></defs>
+          <rect x="4" y="22" width="34" height="34" rx="8" fill="#E8604C" opacity="0.15"/>
+          <rect x="14" y="14" width="34" height="34" rx="8" fill="#E8604C" opacity="0.3"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-hi)" clip-path="url(#v3c)"/>
+          <rect x="27" y="9" width="34" height="34" rx="8" stroke="url(#pz-edge)" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="url(#pz-text-grad)" letter-spacing="-0.03em">pozzle</text>
+        </svg>
+      </div>
+      <div class="variant-info">
+        <span class="name">Gradient Wordmark</span>
+        <span class="tag">Variant</span>
+      </div>
+    </div>
+
+    <!-- Monochrome white -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #0D0D10;">
+        <svg width="300" height="56" viewBox="0 0 360 60" fill="none">
+          <rect x="4" y="22" width="34" height="34" rx="8" fill="#ECECEF" opacity="0.1"/>
+          <rect x="14" y="14" width="34" height="34" rx="8" fill="#ECECEF" opacity="0.2"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="#ECECEF"/>
+          <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="#ECECEF" letter-spacing="-0.03em">pozzle</text>
+        </svg>
+      </div>
+      <div class="variant-info">
+        <span class="name">Monochrome White</span>
+        <span class="tag">Variant</span>
+      </div>
+    </div>
+
+    <!-- Monochrome dark -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #F5F5F5;">
+        <svg width="300" height="56" viewBox="0 0 360 60" fill="none">
+          <rect x="4" y="22" width="34" height="34" rx="8" fill="#111114" opacity="0.08"/>
+          <rect x="14" y="14" width="34" height="34" rx="8" fill="#111114" opacity="0.16"/>
+          <rect x="26" y="8" width="36" height="36" rx="9" fill="#111114"/>
+          <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="#111114" letter-spacing="-0.03em">pozzle</text>
+        </svg>
+      </div>
+      <div class="variant-info">
+        <span class="name">Monochrome Dark</span>
+        <span class="tag">Variant</span>
+      </div>
+    </div>
+
+    <!-- Icon only -->
+    <div class="variant-card">
+      <div class="variant-display" style="background: #06060A;">
+        <div style="display: flex; gap: 40px; align-items: center;">
+          <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
+            <defs><clipPath id="io1"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath></defs>
+            <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+            <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+            <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+            <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#io1)"/>
+            <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+          </svg>
+          <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
+            <rect x="8" y="38" width="46" height="46" rx="11" fill="#ECECEF" opacity="0.1"/>
+            <rect x="22" y="24" width="46" height="46" rx="11" fill="#ECECEF" opacity="0.2"/>
+            <rect x="38" y="12" width="46" height="46" rx="11" fill="#ECECEF"/>
+          </svg>
+        </div>
+      </div>
+      <div class="variant-info">
+        <span class="name">Icon Only</span>
+        <span class="tag">Standalone</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCALE ==================== -->
+  <div class="section-header">
+    <h2>Scale</h2>
+  </div>
+  <p class="section-sub">From favicon to hero — the three-layer structure stays readable at every size. At very small sizes, the highlight and edge details gracefully disappear.</p>
+
+  <div class="scale-row">
+    <div class="scale-item">
+      <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)"/>
+      </svg>
+      <div class="scale-label">16px</div>
+    </div>
+    <div class="scale-item">
+      <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)"/>
+      </svg>
+      <div class="scale-label">24px</div>
+    </div>
+    <div class="scale-item">
+      <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+        <defs><clipPath id="s32"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath></defs>
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#s32)"/>
+      </svg>
+      <div class="scale-label">32px</div>
+    </div>
+    <div class="scale-item">
+      <svg width="48" height="48" viewBox="0 0 100 100" fill="none">
+        <defs><clipPath id="s48"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath></defs>
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#s48)"/>
+        <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+      </svg>
+      <div class="scale-label">48px</div>
+    </div>
+    <div class="scale-item">
+      <svg width="72" height="72" viewBox="0 0 100 100" fill="none">
+        <defs><clipPath id="s72"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath></defs>
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#s72)"/>
+        <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+      </svg>
+      <div class="scale-label">72px</div>
+    </div>
+    <div class="scale-item">
+      <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
+        <defs><clipPath id="s120"><rect x="38" y="12" width="46" height="46" rx="11"/></clipPath></defs>
+        <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+        <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+        <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#s120)"/>
+        <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+      </svg>
+      <div class="scale-label">120px</div>
+    </div>
+  </div>
+
+  <!-- ==================== CONTEXT ==================== -->
+  <div class="section-header">
+    <h2>In Context</h2>
+  </div>
+
+  <div class="context-row">
+    <!-- Browser tab -->
+    <div class="context-card">
+      <div class="context-top" style="background: #15151A;">
+        <div class="favicon-mock">
+          <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
+            <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+            <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+            <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)"/>
+          </svg>
+          <span>Pozzle · Design Center</span>
+        </div>
+      </div>
+      <div class="context-bottom">
+        <div class="label">Browser Favicon</div>
+      </div>
+    </div>
+
+    <!-- Social / App icon -->
+    <div class="context-card">
+      <div class="context-top" style="background: #0D0D10;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <div class="social-mock">
+            <svg width="26" height="26" viewBox="0 0 100 100" fill="none">
+              <rect x="8" y="38" width="46" height="46" rx="11" fill="white" opacity="0.2"/>
+              <rect x="22" y="24" width="46" height="46" rx="11" fill="white" opacity="0.35"/>
+              <rect x="38" y="12" width="46" height="46" rx="11" fill="white"/>
+            </svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px; font-weight: 600; color: #ECECEF;">Pozzle</span>
+            <span style="font-size: 11px; color: #6B6B76;">Design System Platform</span>
+          </div>
+        </div>
+      </div>
+      <div class="context-bottom">
+        <div class="label">App Icon / Social</div>
+      </div>
+    </div>
+
+    <!-- Email signature -->
+    <div class="context-card">
+      <div class="context-top" style="background: #FFFFFF; flex-direction: column; gap: 8px; align-items: flex-start; padding: 24px 32px;">
+        <div style="width: 100%; border-top: 1px solid #E5E5E5; padding-top: 16px;">
+          <svg width="100" height="24" viewBox="0 0 360 60" fill="none">
+            <rect x="4" y="22" width="34" height="34" rx="8" fill="#E8604C" opacity="0.12"/>
+            <rect x="14" y="14" width="34" height="34" rx="8" fill="#E8604C" opacity="0.22"/>
+            <rect x="26" y="8" width="36" height="36" rx="9" fill="url(#pz-grad)"/>
+            <text x="76" y="38" font-family="'DM Sans', sans-serif" font-weight="700" font-size="32" fill="#111114" letter-spacing="-0.03em">pozzle</text>
+          </svg>
+          <div style="margin-top: 6px; font-size: 10px; color: #999; letter-spacing: 0.05em;">RECONCILE · NOT GENERATE</div>
+        </div>
+      </div>
+      <div class="context-bottom">
+        <div class="label">Email Signature</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SPECS ==================== -->
+  <div class="section-header">
+    <h2>Specifications</h2>
+  </div>
+
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="label">Colors</div>
+      <div class="value">
+        <span class="color-swatch" style="background:#F0755E;"></span>#F0755E<br>
+        <span class="color-swatch" style="background:#D4507A;"></span>#D4507A<br>
+        <span class="color-swatch" style="background:#A83D6A;"></span>#A83D6A<br>
+        <span class="color-swatch" style="background:#F5A898;"></span>#F5A898 edge<br>
+        <span class="color-swatch" style="background:#E8604C;"></span>#E8604C ghost
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="label">Typography</div>
+      <div class="value">
+        DM Sans Bold 700<br>
+        letter-spacing: -0.03em<br>
+        lowercase only<br>
+        <br>
+        <span style="color: #6B6B76;">Tagline: all caps</span><br>
+        <span style="color: #6B6B76;">tracking: 0.15em</span>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="label">Icon Construction</div>
+      <div class="value">
+        3 rounded squares<br>
+        border-radius: 11%<br>
+        diagonal offset: ~13%<br>
+        <br>
+        <span style="color: #6B6B76;">Layer 1: 15% opacity</span><br>
+        <span style="color: #6B6B76;">Layer 2: 30% opacity</span><br>
+        <span style="color: #6B6B76;">Layer 3: full gradient</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="label">Front Square Effects</div>
+      <div class="value">
+        3-stop gradient 135°<br>
+        drop-shadow: 0 3 4<br>
+        &nbsp;&nbsp;#E8604C @ 25%<br>
+        highlight: white 20%→0%<br>
+        edge: #F5A898→#A83D6A<br>
+        &nbsp;&nbsp;stroke: 1px @ 50%
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="label">Clear Space</div>
+      <div class="value">
+        Minimum clear space<br>
+        = 1× front square width<br>
+        around all sides of<br>
+        the lockup<br>
+        <br>
+        <span style="color: #6B6B76;">Icon: 0.5× square width</span>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="label">Minimum Sizes</div>
+      <div class="value">
+        Icon: 16px min<br>
+        &nbsp;&nbsp;(no effects below 32px)<br>
+        Lockup: 120px wide min<br>
+        Print: 0.5in icon min<br>
+        <br>
+        <span style="color: #6B6B76;">Favicon: simplified flat</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pz-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0755E"/>
+      <stop offset="50%" stop-color="#D4507A"/>
+      <stop offset="100%" stop-color="#A83D6A"/>
+    </linearGradient>
+    <linearGradient id="pz-hi" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pz-edge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5A898"/>
+      <stop offset="100%" stop-color="#A83D6A"/>
+    </linearGradient>
+    <filter id="pz-shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#E8604C" flood-opacity="0.25"/>
+    </filter>
+    <clipPath id="front-clip">
+      <rect x="38" y="12" width="46" height="46" rx="11"/>
+    </clipPath>
+  </defs>
+  <!-- Layer 1: Furthest back -->
+  <rect x="8" y="38" width="46" height="46" rx="11" fill="#E8604C" opacity="0.15"/>
+  <!-- Layer 2: Middle -->
+  <rect x="22" y="24" width="46" height="46" rx="11" fill="#E8604C" opacity="0.3"/>
+  <!-- Layer 3: Front (reconciled) -->
+  <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-grad)" filter="url(#pz-shadow)"/>
+  <rect x="38" y="12" width="46" height="46" rx="11" fill="url(#pz-hi)" clip-path="url(#front-clip)"/>
+  <rect x="39" y="13" width="44" height="44" rx="10" stroke="url(#pz-edge)" stroke-width="1" fill="none" opacity="0.5"/>
+</svg>
