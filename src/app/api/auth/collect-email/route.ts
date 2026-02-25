@@ -12,10 +12,10 @@ export async function POST(request: Request) {
     }
 
     // Persist to Supabase emails table if configured
-    if (config.supabase.enabled && config.supabase.serviceRoleKey) {
+    if (config.supabase.enabled && config.supabase.secretKey) {
       try {
         const { createClient } = await import("@supabase/supabase-js");
-        const admin = createClient(config.supabase.url, config.supabase.serviceRoleKey);
+        const admin = createClient(config.supabase.url, config.supabase.secretKey);
         await admin.from("emails").upsert({ email }, { onConflict: "email" });
       } catch (err) {
         console.error("[Collect Email] Supabase insert failed:", err);

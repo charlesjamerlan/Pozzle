@@ -8,13 +8,8 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { createClient } from "@/lib/supabase/client";
 import type { User, AuthState } from "@/lib/types/auth";
-
-// We detect Supabase availability at runtime in the browser via the public env var.
-const SUPABASE_ENABLED =
-  typeof window !== "undefined" &&
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 interface AuthContextValue extends AuthState {
   collectEmail: (email: string) => Promise<void>;
@@ -27,36 +22,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
-    isLoading: SUPABASE_ENABLED, // start loading if Supabase is active
+    isLoading: true,
   });
 
   // ------ Supabase session listener ------
   useEffect(() => {
-    if (!SUPABASE_ENABLED) return;
-
     let ignore = false;
+    const supabase = createClient();
 
     async function init() {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      // Get initial session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!ignore && session?.user) {
-        setState({
-          user: {
-            id: session.user.id,
-            email: session.user.email ?? "",
-            createdAt: session.user.created_at,
-          },
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } else if (!ignore) {
-        setState((prev) => ({ ...prev, isLoading: false }));
+        if (!ignore && session?.user) {
+          setState({
+            user: {
+              id: session.user.id,
+              email: session.user.email ?? "",
+              createdAt: session.user.created_at,
+            },
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } else if (!ignore) {
+          setState((prev) => ({ ...prev, isLoading: false }));
+        }
+      } catch {
+        if (!ignore) {
+          setState((prev) => ({ ...prev, isLoading: false }));
+        }
       }
 
       // Listen for auth changes
@@ -95,9 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const collectEmail = useCallback(async (email: string) => {
     setState((prev) => ({ ...prev, isLoading: true }));
 
-    if (SUPABASE_ENABLED) {
-      // Send magic link
-      const { createClient } = await import("@/lib/supabase/client");
+    try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -106,10 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error("[Auth] Supabase OTP error:", error.message);
+      } else {
+        console.log("[Auth] Magic link sent to:", email);
       }
-
-      // Even with Supabase, allow the flow to continue immediately (email-gated, not session-gated)
-      // The user enters their email → proceeds to URL step. Session established later via magic link.
+    } catch (err) {
+      console.error("[Auth] Failed to send magic link:", err);
     }
 
     // Always set local state so the extraction flow progresses
@@ -119,10 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ------ logout ------
   const logout = useCallback(async () => {
-    if (SUPABASE_ENABLED) {
-      const { createClient } = await import("@/lib/supabase/client");
+    try {
       const supabase = createClient();
       await supabase.auth.signOut();
+    } catch {
+      // Supabase not available
     }
     setState({ user: null, isAuthenticated: false, isLoading: false });
   }, []);

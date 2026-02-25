@@ -4,9 +4,11 @@ import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { useExtractionContext } from "@/components/providers/extraction-provider";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
 export function EmailGate() {
   const { submitEmail } = useExtractionContext();
+  const { collectEmail } = useAuthContext();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,14 +18,15 @@ export function EmailGate() {
 
     setLoading(true);
 
-    // Fire-and-forget email collection
+    // Fire-and-forget email collection to API
     fetch("/api/auth/collect-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
-    }).catch(() => {
-      // Silently ignore — fire and forget
-    });
+    }).catch(() => {});
+
+    // Send magic link via Supabase (establishes real session when clicked)
+    await collectEmail(email);
 
     submitEmail(email);
     setLoading(false);

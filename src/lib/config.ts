@@ -19,10 +19,10 @@ export const config = {
 
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+    publishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
+    secretKey: process.env.SUPABASE_SECRET_KEY ?? "",
     get enabled() {
-      return this.url.length > 0 && this.anonKey.length > 0;
+      return this.url.length > 0 && this.publishableKey.length > 0;
     },
   },
 } as const;

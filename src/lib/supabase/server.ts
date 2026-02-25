@@ -7,7 +7,7 @@ export async function createClient() {
 
   return createServerClient(
     config.supabase.url,
-    config.supabase.anonKey,
+    config.supabase.publishableKey,
     {
       cookies: {
         getAll() {
