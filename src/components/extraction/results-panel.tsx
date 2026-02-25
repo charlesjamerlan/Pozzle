@@ -8,7 +8,7 @@ import { TypeScale } from "@/components/extraction/type-scale";
 import { SpacingScale } from "@/components/extraction/spacing-scale";
 import { RadiusShowcase } from "@/components/extraction/radius-showcase";
 import { ConsistencyReportView } from "@/components/extraction/consistency-report";
-import { CssExport } from "@/components/extraction/css-export";
+import { ExportPanel } from "@/components/extraction/export-panel";
 import type { ExtractionResult } from "@/lib/types/extraction";
 import type { ConsistencyReport } from "@/lib/types/consistency";
 
@@ -92,7 +92,7 @@ export function ResultsPanel({ result, report }: ResultsPanelProps) {
           {activeTab === "report" && (
             <ConsistencyReportView report={report} />
           )}
-          {activeTab === "export" && <CssExport result={result} />}
+          {activeTab === "export" && <ExportPanel result={result} report={report} />}
         </motion.div>
       </AnimatePresence>
     </motion.div>

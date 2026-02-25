@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { SpacingToken } from "@/lib/types/extraction";
 
 interface SpacingScaleProps {
@@ -16,7 +17,7 @@ export function SpacingScale({ spacing }: SpacingScaleProps) {
         const widthPercent = Math.min((token.pixels / MAX_BAR_PX) * 100, 100);
 
         return (
-          <div key={token.name} className="flex items-center gap-4">
+          <div key={token.name} className="group flex items-center gap-4">
             <span className="font-mono text-sm text-text-secondary w-24 shrink-0 text-right">
               {token.name}
             </span>
@@ -37,6 +38,10 @@ export function SpacingScale({ spacing }: SpacingScaleProps) {
             <span className="font-mono text-sm text-text-primary w-16 shrink-0">
               {token.value}
             </span>
+
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <CopyButton text={`--spacing-${token.name}: ${token.value};`} />
+            </div>
           </div>
         );
       })}
