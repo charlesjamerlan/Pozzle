@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { config } from "@/lib/config";
 import { createClient } from "@/lib/supabase/server";
-import { getExtractionById } from "@/lib/services/persistence-service";
+import {
+  getExtractionById,
+  deleteExtraction,
+} from "@/lib/services/persistence-service";
 
 export async function GET(
   _request: Request,
@@ -28,4 +31,31 @@ export async function GET(
   }
 
   return NextResponse.json({ extraction });
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!config.supabase.enabled) {
+    return NextResponse.json({ error: "Not configured" }, { status: 404 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const success = await deleteExtraction(id);
+
+  if (!success) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
 }

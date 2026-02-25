@@ -43,6 +43,7 @@
   --animate-slide-up: slide-up 0.5s ease-out;
   --animate-slide-in-from-right: slide-in-from-right 0.3s ease-out;
   --animate-fade-out: fade-out 0.2s ease-in;
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
 }
 
 @keyframes fade-in {
@@ -63,6 +64,11 @@
 @keyframes fade-out {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* Base styles */

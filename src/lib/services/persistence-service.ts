@@ -80,6 +80,31 @@ export async function getUserExtractions(
   }
 }
 
+/** Delete an extraction by id (respects RLS — user must own it). Returns true on success. */
+export async function deleteExtraction(id: string): Promise<boolean> {
+  if (!config.supabase.enabled) return false;
+
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from("extractions")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("[Persistence] Delete failed:", error.message);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("[Persistence] Delete error:", err);
+    return false;
+  }
+}
+
 /** Get a single extraction by id (respects RLS — user must own it). */
 export async function getExtractionById(
   id: string,
