@@ -7,7 +7,8 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="relative min-h-screen bg-canvas">
+      <div className="noise pointer-events-none fixed inset-0 z-[60] opacity-[0.03]" aria-hidden="true" />
       <Navbar />
       <main>{children}</main>
       <Footer />

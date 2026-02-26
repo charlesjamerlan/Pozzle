@@ -43,7 +43,7 @@ function Navbar() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "border-b border-border bg-canvas/80 backdrop-blur-lg"
+          ? "border-b border-border bg-canvas/60 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.04)]"
           : "bg-transparent",
       )}
     >

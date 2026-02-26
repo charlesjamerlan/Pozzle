@@ -50,7 +50,7 @@ function ConfirmDialog({
 
           {/* Dialog */}
           <motion.div
-            className="relative z-10 w-full max-w-sm mx-4 rounded-lg bg-surface-elevated border border-border p-6 shadow-2xl"
+            className="relative z-10 w-full max-w-sm mx-4 rounded-lg bg-surface-elevated/90 backdrop-blur-lg border border-border p-6 shadow-2xl"
             initial={{ opacity: 0, scale: 0.95, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 8 }}
@@ -68,7 +68,7 @@ function ConfirmDialog({
                 {cancelLabel}
               </Button>
               <Button
-                variant={variant === "danger" ? "primary" : "primary"}
+                variant="primary"
                 size="sm"
                 onClick={onConfirm}
                 className={

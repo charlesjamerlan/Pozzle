@@ -18,11 +18,11 @@ function CtaSection() {
 
       <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
         <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="font-serif text-3xl text-text-primary md:text-5xl md:leading-tight"
+          className="font-serif text-3xl text-text-primary md:text-5xl md:leading-tight tracking-tight"
         >
           Ready to decode your design system?
         </motion.h2>
@@ -47,7 +47,7 @@ function CtaSection() {
         >
           <Link
             href="/extract"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-coral to-coral-light px-7 py-3 text-base font-medium text-white shadow-lg shadow-coral/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-coral to-coral-light px-7 py-3 text-base font-medium text-white shadow-[0_0_40px_rgba(255,107,94,0.3)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_60px_rgba(255,107,94,0.4)] active:scale-[0.98]"
           >
             Start Free Analysis
           </Link>

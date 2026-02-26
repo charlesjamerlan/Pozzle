@@ -31,21 +31,29 @@ const valueProps: ValueProp[] = [
   },
 ];
 
+const directions = [
+  { x: -30, y: 0 },   // Extract: from left
+  { x: 0, y: 30 },    // Reconcile: from below
+  { x: 30, y: 0 },    // Host: from right
+];
+
 function ValueProps() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {valueProps.map((prop, index) => {
           const Icon = prop.icon;
+          const dir = directions[index];
           return (
             <motion.div
               key={prop.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: dir.x, y: dir.y }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{
-                duration: 0.5,
-                ease: "easeOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
                 delay: index * 0.12,
               }}
             >
